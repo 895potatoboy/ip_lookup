@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+import requests as r
+import argparse
+import ipaddress
+
+
+# variable setting
+api_base_url = "http://ip-api.com/json/"
+
+maps_base_url = "https://www.google.com/maps/search/?api=1&query="
+
+is_valid = None
+
+# Argument parsing
+parser = argparse.ArgumentParser(description="IP Address Lookup Tool")
+parser.add_argument("ip", help="Ip address to look up.", action="store")
+args = parser.parse_args()
+
+
+
+
+
+def setup(is_valid):
+    try:
+        is_valid = ipaddress.ip_address(args.ip)
+    except ValueError:
+        print("Invalid IP address format.")
+        exit(1)
+def lookup_ip(ip):
+    try:
+        response = r.get(api_base_url + str(ip))
+        data = response.json()
+        if data['status'] == 'success':
+            print(f"IP Address: {data['query']}")
+            print(f"Country: {data['country']}")
+            print(f"Region: {data['regionName']}")
+            print(f"City: {data['city']}")
+            print(f"ISP: {data['isp']}")
+            print(f"Latitude: {data['lat']}")
+            print(f"Longitude: {data['lon']}")
+            print(f"Google maps: {maps_base_url + str(data['lat']) + str(data['lon'])}")
+        else:
+            print("IP address lookup failed.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+
+if __name__ == "__main__":
+    setup(is_valid)
+    lookup_ip(args.ip)
